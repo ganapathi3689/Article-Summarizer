@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <title>Article Summarizer</title>
+  <style>
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 8px solid #3498db;
+      width: 60px;
+      height: 60px;
+      animation: spin 2s linear infinite;
+      margin: auto;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .copy-icon {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <% if (success_msg.length > 0) { %>
+    <script>
+      alert('<%= success_msg %>');
+    </script>
+  <% } %>
+
+  <% if (error_msg.length > 0) { %>
+    <script>
+      alert('<%= error_msg %>');
+    </script>
+  <% } %>
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">Article Summarizer</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+          <% if (login) { %>
+            <li class="nav-item">
+              
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          <% } else { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/login" data-toggle="modal" data-target="#loginModal">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/create" data-toggle="modal" data-target="#signupModal">Sign Up</a>
+            </li>
+          <% } %>
+        </ul>
+      </div>
+    </nav>
+    <h1 class="mt-5">Article Summarizer</h1>
+    <form id="summarize-form" action="/summarize" method="POST">
+      <div class="form-group">
+        <label for="url">Article URL:</label>
+        <input type="text" class="form-control" id="url" name="url" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Summarize</button>
+    </form>
+    <div class="loader" id="loader"></div>
+    <% if (summary) { %>
+      <div class="card mt-5">
+        <div class="card-body">
+          <h5 class="card-title">Summary</h5>
+          <p class="card-text" id="summary-text"><%= summary %></p>
+          <button class="btn btn-secondary copy-icon" onclick="copyToClipboard()">Copy to Clipboard</button>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+
+  <!-- Login Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="/login" method="POST">
+            <div class="form-group">
+              <label for="login-email">Email address</label>
+              <input type="email" class="form-control" id="login-email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input type="password" class="form-control" id="login-password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signup Modal -->
+  <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="signupModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="/create" method="POST">
+            <div class="form-group">
+              <label for="signup-username">Username</label>
+              <input type="text" class="form-control" id="signup-username" name="username" required>
+            </div>
+            <div class="form-group">
+              <label for="signup-email">Email address</label>
+              <input type="email" class="form-control" id="signup-email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="signup-password">Password</label>
+              <input type="password" class="form-control" id="signup-password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    function copyToClipboard() {
+      var copyText = document.getElementById("summary-text");
+      var textArea = document.createElement("textarea");
+      textArea.value = copyText.textContent;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("Copy");
+      document.body.removeChild(textArea);
+      alert("Summary copied to clipboard");
+    }
+
+    document.getElementById("summarize-form").addEventListener("submit", function () {
+      document.getElementById("loader").style.display = "block";
+    });
+  </script>
+</body>
+</html>
